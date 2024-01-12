@@ -22,6 +22,15 @@ Before running the script, ensure you have Node.js installed. You can install th
 npm install fast-csv
 ```
 
+or run :
+```
+yarn install 
+```
+or
+```
+npm install
+```
+
 ## Usage
 
 1. Place your unclean email CSV file in the `./List inbox/` directory. Ensure the file is named `uncleanEmails.csv`.
