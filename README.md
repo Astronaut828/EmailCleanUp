@@ -22,11 +22,11 @@ Before running the script, ensure you have Node.js installed. You can install th
 npm install fast-csv
 ```
 
-or run :
+or run:
 ```
 yarn install 
 ```
-or
+or:
 ```
 npm install
 ```
