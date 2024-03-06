@@ -6,6 +6,7 @@ const fs = require("fs");
 const csv = require("fast-csv");
 
 // Define the input and output file paths and names
+// Edit the filename to match "uncleanEmails" or edit the path below to match your filename.
 const inputFile = "./List inbox/uncleanEmails.csv";
 const outputDirectory = "./List outbox/";
 const outputFileName = "cleanEmails";
