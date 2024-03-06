@@ -40,9 +40,9 @@ fs.createReadStream(inputFile)
 
     // Generate a timestamp for the output file
     const now = new Date();
-    const timestamp = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(
-      now.getDate()
-    ).padStart(2, "0")}-${now.getFullYear()}`;
+    const timestamp = `${String(now.getMonth()).padStart(2, "0")}-
+                       ${String(now.getDate()).padStart(2, "0")}-
+                       ${now.getFullYear()}`;
     const outputFile = `${outputFileName}_${timestamp}.csv`;
 
     // Check if the output directory exists, create it if not
