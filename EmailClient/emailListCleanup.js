@@ -8,64 +8,63 @@ const csv = require("fast-csv");
 // Define the input and output file paths and names
 // Edit the filename to match "uncleanEmails" or edit the path below to match your filename.
 const inputFile = "./List inbox/uncleanEmails.csv";
-const outputDirectory = "./List outbox/";
-const outputFileName = "cleanEmails";
 
-// Create a map to store unique email addresses
+const outputDirectory = "./List outbox/"; // Directory where the cleaned CSV file will be saved.
+const outputFileName = "cleanEmails"; // Base name for the output file, a timestamp will be appended to ensure uniqueness.
+
+// Initialize a Map to keep track of unique email addresses.
 const emailMap = new Map();
 
-// Read the input file and process it line by line
+// Begin reading input CSV file in a stream to handle large files.
 fs.createReadStream(inputFile)
-  .pipe(csv.parse({ headers: true, delimiter: ";" }))
+  .pipe(csv.parse({ headers: true, delimiter: ";" })) // Parse the CSV data.
   .on("data", (row) => {
-    // Extract email and name from each row
+    // For each row of data, extract the 'Email:' and 'Name:' fields.
     const email = row["Email:"];
     const name = row["Name:"];
 
-    // Check if email is present in the row
+    // Proceed only if the email field is not empty.
     if (email) {
-      // Clean and standardize the email format
+      // Standardize the email address to prevent duplicates based on case sensitivity or leading/trailing spaces.
       const cleanedEmail = email.toLowerCase().trim();
 
-      // Add the email to the map if it's not already present
+      // If this email hasn't been encountered before, add it to the map with its associated name.
       if (!emailMap.has(cleanedEmail)) {
         emailMap.set(cleanedEmail, name);
       }
     }
   })
   .on("end", () => {
-    // Sort the unique emails alphabetically
+    // After processing all rows, sort the unique emails alphabetically to prepare for output.
     const uniqueEmails = Array.from(emailMap).sort((a, b) =>
       a[0].localeCompare(b[0])
     );
 
-    // Generate a timestamp for the output file
+    // Create a timestamp string to append to the output filename, ensuring it's unique and prevents overwrites.
     const now = new Date();
-    const timestamp = `${String(now.getMonth()).padStart(2, "0")}-
-                       ${String(now.getDate()).padStart(2, "0")}-
-                       ${now.getFullYear()}`;
+    const timestamp = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}-${now.getFullYear()}`;
     const outputFile = `${outputFileName}_${timestamp}.csv`;
 
-    // Check if the output directory exists, create it if not
+    // Ensure the output directory exists; create it if it doesn't, including any necessary parent directories.
     if (!fs.existsSync(outputDirectory)) {
       fs.mkdirSync(outputDirectory, { recursive: true });
     }
 
-    // Create a stream to write the cleaned email list to a file
+    // Set up a writable stream to the designated output file for the cleaned CSV data.
     const outputStream = fs.createWriteStream(outputDirectory + outputFile);
 
-    // Map the unique emails and names to the required format
+    // Convert the sorted unique email list to object format for the CSV file.
     const outputData = uniqueEmails.map(([email, name]) => ({
       Name: name,
       Email: email,
     }));
 
-    // Write the output data to a CSV file
+    // Write the cleaned and formatted data to the new CSV file, including headers.
     csv
       .write(outputData, { headers: true })
-      .pipe(outputStream)
+      .pipe(outputStream) // Pipe the CSV content to the output stream.
       .on("finish", () => {
-        // Log a message when the process is complete
+        // Once the write operation is complete, log a confirmation message with the output file's name.
         console.log("Email list cleaned and saved to", outputFile);
       });
   });
