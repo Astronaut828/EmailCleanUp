@@ -17,18 +17,18 @@ const emailMap = new Map();
 
 // Begin reading input CSV file in a stream to handle large files.
 fs.createReadStream(inputFile)
-  .pipe(csv.parse({ headers: true, delimiter: ";" })) // Parse the CSV data.
-  .on("data", (row) => {
-    // For each row of data, extract the 'Email:' and 'Name:' fields.
-    const email = row["Email:"];
-    const name = row["Name:"];
+  .pipe(csv.parse({ headers: false, delimiter: ";" }))
+  .on("data", (data) => {
+    // Assuming first value is name and second is email since no headers are present
+    const name = data[0];
+    const email = data[1];
 
-    // Proceed only if the email field is not empty.
+    // Check if email is present
     if (email) {
-      // Standardize the email address to prevent duplicates based on case sensitivity or leading/trailing spaces.
+      // Clean and standardize the email format
       const cleanedEmail = email.toLowerCase().trim();
 
-      // If this email hasn't been encountered before, add it to the map with its associated name.
+      // Add the email to the map if it's not already present
       if (!emailMap.has(cleanedEmail)) {
         emailMap.set(cleanedEmail, name);
       }
